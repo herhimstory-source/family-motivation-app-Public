@@ -1,11 +1,11 @@
 
 const CACHE_NAME = 'family-motivation-app-v1';
 const URLS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/index.tsx',
-  '/icon-192x192.png',
-  '/icon-512x512.png'
+  './',
+  './index.html',
+  './index.tsx',
+  './icon-192x192.png',
+  './icon-512x512.png'
 ];
 
 // Install the service worker and cache the app shell
@@ -21,37 +21,44 @@ self.addEventListener('install', event => {
 
 // Serve cached content when offline
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-
-        // Clone the request to use it both for the cache and for the browser
-        const fetchRequest = event.request.clone();
-
-        return fetch(fetchRequest).then(
-          response => {
-            // Check if we received a valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
+  // We only want to call event.respondWith() if this is a navigation request
+  // for an HTML page.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      (async () => {
+        try {
+          // First, try to use the navigation preload response if it's supported.
+          const preloadResponse = await event.preloadResponse;
+          if (preloadResponse) {
+            return preloadResponse;
           }
-        );
-      })
-  );
+
+          // Always try the network first.
+          const networkResponse = await fetch(event.request);
+          return networkResponse;
+        } catch (error) {
+          // catch is only triggered if an exception is thrown, which typically
+          // means a network error.
+          // If fetch() returns a valid HTTP response with a 4xx or 5xx status,
+          // the catch() will NOT be called.
+          console.log('Fetch failed; returning offline page instead.', error);
+
+          const cache = await caches.open(CACHE_NAME);
+          const cachedResponse = await cache.match('./');
+          return cachedResponse;
+        }
+      })()
+    );
+  } else {
+    // For non-navigation requests, use a cache-first strategy.
+    event.respondWith(
+        caches.match(event.request).then(response => {
+            return response || fetch(event.request);
+        })
+    );
+  }
 });
+
 
 // Clean up old caches
 self.addEventListener('activate', event => {
