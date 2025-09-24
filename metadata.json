@@ -1,0 +1,5 @@
+{
+  "name": "Family Motivation App",
+  "description": "A web application to track and manage family goals, view progress on a calendar, and see statistics on achievements. It's designed to be a motivational tool for the whole family.",
+  "requestFramePermissions": []
+}
