@@ -9,8 +9,8 @@
     <meta name="theme-color" content="#3b82f6">
     <title>Family Motivation App</title>
     
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icon-192x192.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -67,11 +67,11 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="./index.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
+          navigator.serviceWorker.register('./service-worker.js')
             .then(registration => {
               console.log('ServiceWorker registration successful with scope: ', registration.scope);
             })
